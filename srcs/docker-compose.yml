@@ -1,7 +1,13 @@
 version: '3.8'
 services:
   nginx:
-    build: requirements/nginx
+    build:
+      context: requirements/nginx
+      args:
+        - 42_USER
+        - DOMAIN_NAME
+        - NGINX_CRT
+        - NGINX_KEY
     container_name: nginx
     env_file: .env
     networks:
@@ -47,8 +53,16 @@ services:
 volumes:
   wordpress:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "/home/bsilva-c/data/wordpress_data"
   mariadb:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "/home/bsilva-c/data/mariadb_data"
 networks:
   inception:
     driver: bridge
