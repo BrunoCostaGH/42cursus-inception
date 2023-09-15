@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  nginx:
+    build: requirements/nginx
+    container_name: nginx
+    env_file: .env
+    networks:
+      - inception
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress:/var/www/wordpress
+    restart: on-failure
+  wordpress:
+    build: requirements/wordpress
+    container_name: wordpress
+    env_file: .env
+    networks:
+      - inception
+    expose:
+      - "9000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - wordpress:/var/www/wordpress
+    restart: on-failure
+  mariadb:
+    build: requirements/mariadb
+    container_name: mariadb
+    env_file: .env
+    networks:
+      - inception
+    expose:
+      - "3306"
+    volumes:
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h localhost -uroot -p${SQL_ROOT_PASSWORD}
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+volumes:
+  wordpress:
+    driver: local
+  mariadb:
+    driver: local
+networks:
+  inception:
+    driver: bridge
