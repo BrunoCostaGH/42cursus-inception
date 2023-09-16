@@ -10,13 +10,13 @@
 #                                                                              #
 # **************************************************************************** #
 
-all: build up ps
+all: build up
 build:
-	@mkdir -p /home/bsilva-c/data/mariadb_data /home/bsilva-c/data/wordpress_data;
+	@mkdir -p /home/bsilva-c/data/mariadb_data /home/bsilva-c/data/wordpress_data
 	sudo docker compose -f ./srcs/docker-compose.yml build --no-cache
-	@sudo grep -Fq "bsilva-c.42.fr" /etc/hosts || sudo sed -i 's/^127.0.0.1.*$/& bsilva-c.42.fr/g' /etc/hosts
+	@sudo grep -Fq "bsilva-c.42.fr" /etc/hosts || sudo sed -i '/127\.0\.0\.1/ s/$$/ bsilva-c.42.fr/' /etc/hosts
 up: build
-	sudo docker compose -f ./srcs/docker-compose.yml up -d
+	sudo docker compose -f ./srcs/docker-compose.yml up -d --no-build
 down:
 	sudo docker compose -f ./srcs/docker-compose.yml down
 start:
